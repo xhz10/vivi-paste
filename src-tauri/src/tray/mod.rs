@@ -13,7 +13,7 @@ pub fn init_system_tray(app: &mut App) -> Result<(), Box<dyn std::error::Error>>
     let menu = Menu::with_items(app, &[&quit_i])?;
 
     // 定义系统托盘
-    let tray = TrayIconBuilder::new()
+    TrayIconBuilder::new()
         .icon(app.default_window_icon().unwrap().clone())
         .menu_on_left_click(false) // 不可以点左键哦
         .menu(&menu)

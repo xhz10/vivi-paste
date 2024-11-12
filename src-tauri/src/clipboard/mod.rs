@@ -1,6 +1,6 @@
+use copypasta::{ClipboardContext, ClipboardProvider};
 use std::sync::Arc;
 use std::time::Duration;
-use copypasta::{ClipboardContext, ClipboardProvider};
 use tokio::sync::Mutex;
 use tokio::time::sleep;
 
@@ -18,7 +18,8 @@ pub async fn start_clipboard_monitor() {
         async move {
             // 创建一个剪切板的上下文ctx 用于访问系统剪切板
             let mut ctx = ClipboardContext::new().unwrap();
-            loop { // 无线循环
+            loop {
+                // 无线循环
                 // match 读取剪切板的内容的过程
                 // OK 代表读取成功获取到当前剪切板的值
                 if let Ok(current_content) = ctx.get_contents() {
