@@ -1,8 +1,13 @@
 mod tray;
+mod clipboard;
 
+use std::sync::Arc;
 use tauri::tray::TrayIconBuilder;
 use tauri_plugin_clipboard_manager::ClipboardExt;
+use tokio::spawn;
+use tokio::sync::Mutex;
 use tray::init_system_tray;
+use crate::clipboard::start_clipboard_monitor;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -19,13 +24,14 @@ pub fn run() {
             }
             // 初始化系统托盘信息
             init_system_tray(app)?;
-
-            // 看看剪切板的功能
-            // app.clipboard()
-            //     .write_text("哈哈哈哈，剪切板".to_string())
-            //     .unwrap();
-            let content = app.clipboard().read_text();
-            println!("{:?}", content);
+            // 异步的启动一个监控程序
+            // 然而，当你在 Tauri 的设置或启动函数中调用
+            // start_clipboard_monitor 时，为了确保该异步任务正确地在
+            // Tauri 的异步运行时环境中调度，
+            // 需要再次使用 tauri::async_runtime::spawn
+            tauri::async_runtime::spawn(async {
+                start_clipboard_monitor().await;
+            });
 
             Ok(())
         })
