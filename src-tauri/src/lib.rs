@@ -8,6 +8,7 @@ use crate::window_op::init_window_status;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -23,6 +24,8 @@ pub fn run() {
 
             // 初始化窗口状态
             init_window_status(app);
+
+
 
             // 初始化系统托盘信息
             init_system_tray(app)?;
