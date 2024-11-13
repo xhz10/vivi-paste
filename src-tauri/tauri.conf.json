@@ -12,9 +12,15 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "vivi-paste",
-        "width": 800,
-        "height": 600,
+        "transparent": true,
+        "decorations": false,
+        "visible": false,
+        "width": 1000,
+        "height": 50,
+        "x": 0,
+        "y": 20,
         "resizable": true,
         "fullscreen": false
       }

@@ -12,7 +12,7 @@ pub fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     let show_i = MenuItem::with_id(app, "show", "展示主屏幕", true, None::<&str>)?;
 
     // 2. 添加到菜单里面  添加的是引用
-    let menu = Menu::with_items(app, &[&show_i,&quit_i])?;
+    let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
 
     // 定义系统托盘
     TrayIconBuilder::new()
@@ -21,7 +21,12 @@ pub fn init_system_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
         .menu(&menu)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "show" => {
-                app.get_window("main").unwrap().show().unwrap();
+                let window = app.get_window("main").unwrap();
+                if window.is_visible().unwrap() {
+                    window.hide().unwrap();
+                } else {
+                    window.show().unwrap();
+                }
             }
             "quit" => {
                 println!("Quitting...");
