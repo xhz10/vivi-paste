@@ -13,16 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "vivi-paste",
-        "transparent": true,
-        "decorations": false,
-        "visible": false,
-        "width": 1000,
-        "height": 50,
-        "x": 0,
-        "y": 20,
-        "resizable": true,
-        "fullscreen": false
+        "title": "vivi-paste"
       }
     ],
     "security": {

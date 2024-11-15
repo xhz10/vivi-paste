@@ -23,8 +23,7 @@ pub struct PasteDB {
 impl PasteDB {
     /// 构建DB的方法
     pub fn form(app: &App) -> PasteDB {
-        let store = app.store("paste.json")
-            .expect("初始化失败");
+        let store = app.store("paste.json").expect("初始化失败");
 
         PasteDB {
             max_cache_size: 2,
@@ -34,15 +33,29 @@ impl PasteDB {
         }
     }
 
-    /// 落库
-    pub fn put(&self,key: &str,value: serde_json::Value) ->Result<(),&str>{
-        self.db_store.set(key,value);
+    /// 放入一个剪切板的内容
+    pub fn put_paste_info(&mut self, key: String) -> Result<(), &str> {
+        if key.is_empty() {
+            return Err("空数据");
+        }
+        // 存在列表里面
+        self.paste_list.insert(0, key);
         Ok(())
     }
 
+    /// 返回一个列表信息
+    pub fn show_now_paste_list(&self) -> impl Iterator<Item = &String> {
+        self.paste_list.iter()
+    }
+
+    /// 落库
+    pub fn put(&self, key: &str, value: serde_json::Value) -> Result<(), &str> {
+        self.db_store.set(key, value);
+        Ok(())
+    }
 
     /// 取出来
-    pub fn get(&self,key: &str) -> Result<serde_json::Value,&str>{
+    pub fn get(&self, key: &str) -> Result<serde_json::Value, &str> {
         Ok(self.db_store.get(key).expect("数据不存在"))
     }
 

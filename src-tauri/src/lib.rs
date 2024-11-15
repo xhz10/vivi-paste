@@ -5,10 +5,9 @@ mod window_op;
 
 use crate::clipboard::start_clipboard_monitor;
 use crate::window_op::init_window_status;
-use database::PasteDB;
-use serde_json::json;
+use std::sync::Arc;
 use tauri::Manager;
-use tauri_plugin_store::StoreExt;
+use tokio::sync::Mutex;
 use tray::init_system_tray;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -43,18 +42,11 @@ pub fn run() {
             // start_clipboard_monitor 时，为了确保该异步任务正确地在
             // Tauri 的异步运行时环境中调度，
             // 需要再次使用 tauri::async_runtime::spawn
-            tauri::async_runtime::spawn(async {
-                start_clipboard_monitor().await;
+
+            let vv = Arc::new(Mutex::new(Vec::new()));
+            tauri::async_runtime::spawn(async move {
+                start_clipboard_monitor(vv).await;
             });
-
-            let paste_db = PasteDB::form(app);
-            paste_db
-                .put("test:key:2", json!({"value":vec!["hello","world"]}))
-                .expect("TODO: panic message");
-
-            let value = paste_db.get("test:key:2").expect("错了错了");
-            println!("{}", value);
-            paste_db.close();
             Ok(())
         })
         .run(tauri::generate_context!())
