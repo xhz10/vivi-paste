@@ -51,6 +51,7 @@ impl PasteDB {
     }
 }
 
+/// 这里其实应该做一个初始化限制的可恶啊
 pub fn initialize_paste_db(app: &App) -> Option<Arc<PasteDB>> {
     // 初始化 `PasteDB`，只会成功一次
     let db = Arc::new(PasteDB::form(app));
@@ -58,3 +59,7 @@ pub fn initialize_paste_db(app: &App) -> Option<Arc<PasteDB>> {
     Some(PASTE_DB.get()?.clone())
 }
 
+
+pub fn get_instance() -> Arc<PasteDB>{
+    PASTE_DB.get().unwrap().clone()
+}

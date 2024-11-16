@@ -10,7 +10,7 @@ use std::sync::Arc;
 use tauri::Manager;
 use tokio::sync::Mutex;
 use tray::init_system_tray;
-use crate::database::{initialize_paste_db};
+use crate::database::{get_instance, initialize_paste_db};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -45,8 +45,8 @@ pub fn run() {
             // Tauri 的异步运行时环境中调度，
             // 需要再次使用 tauri::async_runtime::spawn
             // 数据的来源怎么取呢?
-            let db = initialize_paste_db(app)
-                .unwrap_or_else(|| panic!("数据库启动初始化失败了！"));
+            initialize_paste_db(app);
+            let db = get_instance();
             // let paste_list = Arc::new(Mutex::new(Vec::new()));
             tauri::async_runtime::spawn(async move {
                 start_clipboard_monitor(db.get_safe_paste_list()).await;
