@@ -9,7 +9,7 @@
               style="height: 100vh; overflow-y: auto;"
           >
             <el-menu-item
-                v-for="menuItem in items"
+                v-for="menuItem in titleItems"
                 :key="menuItem.index"
                 :index="menuItem.index"
                 :class="{ 'active-menu-item': selectedItem === menuItem.index }"
@@ -19,7 +19,7 @@
           </el-menu>
         </el-col>
         <el-col :span="18" style="padding: 20px;">
-          <el-card v-if="currentItem" class="box-card">
+          <el-card v-if="currentItem" class="box-card" style="overflow-y: auto">
             <div slot="header">
               <span>{{ currentItem.name }} Details</span>
             </div>
@@ -35,22 +35,7 @@
 
 <script setup lang="ts">
 import {ref, onMounted, computed, nextTick} from 'vue';
-import { invoke } from "@tauri-apps/api/core";
-
-const items = ref([
-  {index: '1', name: 'Item 1'},
-  {index: '2', name: 'Item 2'},
-  {index: '3', name: 'Item 3'},
-  {index: '4', name: 'Item 4'},
-  {index: '5', name: 'Item 5'},
-  {index: '6', name: 'Item 6'},
-  {index: '7', name: 'Item 7'},
-  {index: '8', name: 'Item 8'},
-  {index: '9', name: 'Item 9'},
-  {index: '10', name: 'Item 10'},
-  {index: '11', name: 'Item 11'},
-  {index: '12', name: 'Item 12'},
-]);
+import {invoke} from "@tauri-apps/api/core";
 
 const titleItems = ref([]
 );
@@ -61,7 +46,7 @@ const detailItems = ref([]
 const selectedItem = ref('1');
 
 const currentItem = computed(() => {
-  return items.value.find(item => item.index === selectedItem.value);
+  return detailItems.value.find(item => item.index === selectedItem.value);
 });
 
 function handleSelect(key) {
@@ -89,7 +74,7 @@ function scrollToSelected() {
 }
 
 function handleKeydown(event) {
-  const itemKeys = items.value.map(item => item.index);
+  const itemKeys = titleItems.value.map(item => item.index);
   let index = itemKeys.indexOf(selectedItem.value);
 
   if (event.key === 'ArrowDown') {
@@ -104,30 +89,32 @@ function handleKeydown(event) {
     scrollToSelected();
   });
 }
+
 const pasteData = ref({
-      title_list: [],
-      detail_list: [],
-      size: 0,
+  title_list: [],
+  detail_list: [],
+  size: 0,
 });
 
 async function fetchPasteData() {
   invoke('get_now_paste')
-    .then((data)=>{
-      pasteData.title_list = data.title_list;
-      pasteData.detail_list = data.detail_list;
-      pasteData.size = data.size;
-      titleItems.value = data.title_list.map((title, index) => {
-  return {
-    index: index,
-    name: title
-  };
-  detailItems.value = data.detail_list.map((title, index) => {
-  return {
-    index: index,
-    name: title
-  };
-  });
-});
+      .then((data) => {
+        pasteData.title_list = data.title_list;
+        pasteData.detail_list = data.detail_list;
+        pasteData.size = data.size;
+        titleItems.value = data.title_list.map((title, index) => {
+          return {
+            index: index,
+            name: title
+          }
+        });
+        detailItems.value = data.detail_list.map((title, index) => {
+          return {
+            index: index,
+            name: title
+          }
+        });
+      });
 }
 
 

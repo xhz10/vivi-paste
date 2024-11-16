@@ -37,6 +37,5 @@ pub async fn get_now_paste() -> VuePasteData{
         }
         detail_list.push(p.to_string());
     });
-    println!("输出这里了rust");
     VuePasteData::form(size,title_list,detail_list)
 }
