@@ -1,13 +1,12 @@
-
-use serde::Serialize;
 use crate::database::get_instance;
-
+use serde::Serialize;
+use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Serialize)]
 pub struct VuePasteData {
-    title_list: Vec<String>, // 返回的title详情
+    title_list: Vec<String>,  // 返回的title详情
     detail_list: Vec<String>, // 返回的内容详情
-    size: usize, // 剪切板的内容大小
+    size: usize,              // 剪切板的内容大小
 }
 impl VuePasteData {
     pub fn form(size: usize, title_list: Vec<String>, detail_list: Vec<String>) -> VuePasteData {
@@ -21,7 +20,7 @@ impl VuePasteData {
 
 /// 取出当前的剪切板的全部内容
 #[tauri::command]
-pub async fn get_now_paste() -> VuePasteData{
+pub async fn get_now_paste() -> VuePasteData {
     let db = get_instance();
     // 返回值已经拿到了
     let paste = db.get_safe_paste_list_copy().await;
@@ -31,11 +30,18 @@ pub async fn get_now_paste() -> VuePasteData{
     let mut detail_list = Vec::new();
     paste.iter().for_each(|p| {
         if p.len() > 10 {
-            title_list.push(p[0..10].to_string());
+            title_list.push(safe_truncate(&p, 10));
         } else {
             title_list.push(p.to_string());
         }
         detail_list.push(p.to_string());
     });
-    VuePasteData::form(size,title_list,detail_list)
+    VuePasteData::form(size, title_list, detail_list)
+}
+
+fn safe_truncate(s: &str, max_graphemes: usize) -> String {
+    UnicodeSegmentation::graphemes(s, true)
+        .filter(|g| !g.trim().is_empty())
+        .take(max_graphemes)
+        .collect()
 }
