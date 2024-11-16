@@ -51,10 +51,18 @@ impl PasteDB {
     }
 }
 
-pub fn initialize_paste_db(app: &App) -> Option<Arc<PasteDB>> {
+fn initialize_paste_db(app: &App) -> Arc<PasteDB> {
     // 初始化 `PasteDB`，只会成功一次
     let db = Arc::new(PasteDB::form(app));
-    PASTE_DB.set(db).ok()?;
-    Some(PASTE_DB.get()?.clone())
+    match PASTE_DB.set(db.clone()).ok() {
+        None => { panic!("初始化数据库失败啦")}
+        Some(()) => { }
+    }
+    db
 }
+pub fn get_db_instance(app: &App) ->Arc<PasteDB> {
+    PASTE_DB.get_or_init(|| initialize_paste_db(app)).clone()
+}
+
+
 

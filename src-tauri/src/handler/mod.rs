@@ -1,4 +1,12 @@
+use crate::database;
+/// 前端调用后端都在这里
+///
+///
+///
+
+
+/// 方法 1测试一下输出剪切板的功能
 #[tauri::command]
-fn my_custom_command() {
-    println!("I was invoked from JS!");
+fn test_printf_paste() {
+
 }

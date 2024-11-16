@@ -10,7 +10,7 @@ use std::sync::Arc;
 use tauri::Manager;
 use tokio::sync::Mutex;
 use tray::init_system_tray;
-use crate::database::{initialize_paste_db};
+use crate::database::{get_db_instance};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -39,15 +39,14 @@ pub fn run() {
 
             // 初始化系统托盘信息
             init_system_tray(app)?;
-            // 异步的启动一个监控程序
-            // 然而，当你在 Tauri 的设置或启动函数中调用
-            // start_clipboard_monitor 时，为了确保该异步任务正确地在
-            // Tauri 的异步运行时环境中调度，
-            // 需要再次使用 tauri::async_runtime::spawn
-            // 数据的来源怎么取呢?
-            let db = initialize_paste_db(app)
-                .unwrap_or_else(|| panic!("数据库启动初始化失败了！"));
-            // let paste_list = Arc::new(Mutex::new(Vec::new()));
+            // 数据库的数据来源
+            let db = get_db_instance(app);
+            /// 异步的启动一个监控程序
+            /// 然而，当你在 Tauri 的设置或启动函数中调用
+            /// start_clipboard_monitor 时，为了确保该异步任务正确地在
+            /// Tauri 的异步运行时环境中调度，
+            /// 需要再次使用 tauri::async_runtime::spawn
+            /// 数据的来源怎么取呢?
             tauri::async_runtime::spawn(async move {
                 start_clipboard_monitor(db.get_safe_paste_list()).await;
             });
