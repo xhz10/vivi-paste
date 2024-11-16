@@ -52,6 +52,12 @@ const items = ref([
   {index: '12', name: 'Item 12'},
 ]);
 
+const titleItems = ref([]
+);
+
+const detailItems = ref([]
+);
+
 const selectedItem = ref('1');
 
 const currentItem = computed(() => {
@@ -98,11 +104,38 @@ function handleKeydown(event) {
     scrollToSelected();
   });
 }
+const pasteData = ref({
+      title_list: [],
+      detail_list: [],
+      size: 0,
+});
+
+async function fetchPasteData() {
+  invoke('get_now_paste')
+    .then((data)=>{
+      pasteData.title_list = data.title_list;
+      pasteData.detail_list = data.detail_list;
+      pasteData.size = data.size;
+      titleItems.value = data.title_list.map((title, index) => {
+  return {
+    index: index,
+    name: title
+  };
+  detailItems.value = data.detail_list.map((title, index) => {
+  return {
+    index: index,
+    name: title
+  };
+  });
+});
+}
+
 
 const menuContainer = ref(null);
 
 onMounted(() => {
-  invoke('my_custom_command');
+  fetchPasteData();
+  console.log("输出到这里");
   nextTick(() => {
     if (menuContainer.value) {
       menuContainer.value.focus(); // 聚焦菜单容器

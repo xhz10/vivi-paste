@@ -45,6 +45,17 @@ impl PasteDB {
         Arc::clone(&self.paste_list)
     }
 
+    /// 取出一个copy的内容
+    pub async fn get_safe_paste_list_copy(&self) -> Vec<String> {
+        // new一个返回值出来
+        let mut res: Vec<String> = Vec::new();
+        let paste = self.paste_list.lock().await;
+        paste.iter().for_each(|p| {
+            res.push(p.clone());
+        });
+        res
+    }
+
     /// 关闭资源
     pub fn close(&self) {
         self.db_store.close_resource();
