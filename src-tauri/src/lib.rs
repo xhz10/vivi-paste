@@ -2,6 +2,7 @@ mod clipboard;
 mod database;
 mod tray;
 mod window_op;
+mod handler;
 
 use crate::clipboard::start_clipboard_monitor;
 use crate::window_op::init_window_status;
@@ -9,6 +10,7 @@ use std::sync::Arc;
 use tauri::Manager;
 use tokio::sync::Mutex;
 use tray::init_system_tray;
+use crate::database::{initialize_paste_db};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -42,10 +44,12 @@ pub fn run() {
             // start_clipboard_monitor 时，为了确保该异步任务正确地在
             // Tauri 的异步运行时环境中调度，
             // 需要再次使用 tauri::async_runtime::spawn
-
-            let vv = Arc::new(Mutex::new(Vec::new()));
+            // 数据的来源怎么取呢?
+            let db = initialize_paste_db(app)
+                .unwrap_or_else(|| panic!("数据库启动初始化失败了！"));
+            // let paste_list = Arc::new(Mutex::new(Vec::new()));
             tauri::async_runtime::spawn(async move {
-                start_clipboard_monitor(vv).await;
+                start_clipboard_monitor(db.get_safe_paste_list()).await;
             });
             Ok(())
         })

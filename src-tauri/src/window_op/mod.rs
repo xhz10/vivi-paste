@@ -13,6 +13,8 @@ pub fn init_window_status(app: &App) {
                     window.hide().unwrap();
                 } else {
                     window.show().unwrap();
+                    window.set_focus().unwrap();
+                    window.set_always_on_top(true).unwrap();
                 }
             }
         })
