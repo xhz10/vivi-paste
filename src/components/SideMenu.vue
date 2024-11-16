@@ -1,54 +1,55 @@
 <template>
   <div ref="menuContainer" tabindex="0" style="outline: none;">
-  <el-container style="height: 100vh;">
-    <el-row>
-      <el-col :span="6" style="border-right: 1px solid #dcdfe6;">
-        <el-menu
-            :default-active="selectedItem"
-            @select="handleSelect"
-            style="height: 100vh; overflow-y: auto;"
-        >
-          <el-menu-item
-              v-for="menuItem in items"
-              :key="menuItem.index"
-              :index="menuItem.index"
-              :class="{ 'active-menu-item': selectedItem === menuItem.index }"
+    <el-container style="height: 100vh;">
+      <el-row>
+        <el-col :span="6" style="border-right: 1px solid #dcdfe6;">
+          <el-menu
+              :default-active="selectedItem"
+              @select="handleSelect"
+              style="height: 100vh; overflow-y: auto;"
           >
-            {{ menuItem.name }}
-          </el-menu-item>
-        </el-menu>
-      </el-col>
-      <el-col :span="18" style="padding: 20px;">
-        <el-card v-if="currentItem" class="box-card">
-          <div slot="header">
-            <span>{{ currentItem.name }} Details</span>
-          </div>
-          <div>
-            Details for {{ currentItem.name }} go here.
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-  </el-container>
+            <el-menu-item
+                v-for="menuItem in items"
+                :key="menuItem.index"
+                :index="menuItem.index"
+                :class="{ 'active-menu-item': selectedItem === menuItem.index }"
+            >
+              {{ menuItem.name }}
+            </el-menu-item>
+          </el-menu>
+        </el-col>
+        <el-col :span="18" style="padding: 20px;">
+          <el-card v-if="currentItem" class="box-card">
+            <div slot="header">
+              <span>{{ currentItem.name }} Details</span>
+            </div>
+            <div>
+              Details for {{ currentItem.name }} go here.
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-container>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted,computed,nextTick } from 'vue';
+import {ref, onMounted, computed, nextTick} from 'vue';
+import { invoke } from "@tauri-apps/api/core";
 
 const items = ref([
-  { index: '1', name: 'Item 1' },
-  { index: '2', name: 'Item 2' },
-  { index: '3', name: 'Item 3' },
-  { index: '4', name: 'Item 4' },
-  { index: '5', name: 'Item 5' },
-  { index: '6', name: 'Item 6' },
-  { index: '7', name: 'Item 7' },
-  { index: '8', name: 'Item 8' },
-  { index: '9', name: 'Item 9' },
-  { index: '10', name: 'Item 10' },
-  { index: '11', name: 'Item 11' },
-  { index: '12', name: 'Item 12' },
+  {index: '1', name: 'Item 1'},
+  {index: '2', name: 'Item 2'},
+  {index: '3', name: 'Item 3'},
+  {index: '4', name: 'Item 4'},
+  {index: '5', name: 'Item 5'},
+  {index: '6', name: 'Item 6'},
+  {index: '7', name: 'Item 7'},
+  {index: '8', name: 'Item 8'},
+  {index: '9', name: 'Item 9'},
+  {index: '10', name: 'Item 10'},
+  {index: '11', name: 'Item 11'},
+  {index: '12', name: 'Item 12'},
 ]);
 
 const selectedItem = ref('1');
@@ -101,6 +102,7 @@ function handleKeydown(event) {
 const menuContainer = ref(null);
 
 onMounted(() => {
+  invoke('my_custom_command');
   nextTick(() => {
     if (menuContainer.value) {
       menuContainer.value.focus(); // 聚焦菜单容器

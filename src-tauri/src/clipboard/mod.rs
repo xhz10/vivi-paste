@@ -37,9 +37,9 @@ pub async fn start_clipboard_monitor(paste_list: Arc<Mutex<Vec<String>>>) {
                         paste.insert(0, current_content);
 
                         // 输出一下
-                        paste.iter().for_each(|s| {
-                            println!("输出一下结果: {}", s);
-                        });
+                        // paste.iter().for_each(|s| {
+                        //     println!("输出一下结果: {}", s);
+                        // });
                     }
                 }
                 sleep(Duration::from_secs(1)).await;

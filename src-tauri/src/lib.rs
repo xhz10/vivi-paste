@@ -11,6 +11,7 @@ use tauri::Manager;
 use tokio::sync::Mutex;
 use tray::init_system_tray;
 use crate::database::{get_instance, initialize_paste_db};
+use crate::handler::{my_custom_command};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -53,6 +54,7 @@ pub fn run() {
             });
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![my_custom_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
