@@ -2,36 +2,39 @@
 
 #### 介绍
 灵活的粘贴工具
+一个剪切板
 
 #### 软件架构
-软件架构说明
+前端是vite配合element-ui
+后端是rust
 
 
 #### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
+嘻嘻
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+安装完成后按一下ctrl + shift + v 显示出剪切板页面 再按一下就隐藏了
+选中要粘贴的历史按一下回车就自动放在剪切板里了
+
+
+0. tauri的开发安装去官网看吧 https://tauri.app/
+1. git clone 之后进入vivi-paste文件夹
+2. 不放心就把package-lock.json和src-tauri/Cargo.lock删了
+3. 更新前端资源包
+```bash
+npm install
+```
+4. 基本上这一关过了就无所谓了
+5. 下面是本地调试
+```bash
+cargo tauri dev
+```
+6. 或者可以直接生成对应平台下的可执行文件
+```bash
+cargo tauri build
+```
 
 #### 参与贡献
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1. 有懂前端的可以帮弟弟我搞一搞页面，我的V1.0太丑了
