@@ -1,4 +1,4 @@
-use crate::database::get_instance;
+use crate::{clipboard::write_to_clipboard, database::get_instance};
 use serde::Serialize;
 use unicode_segmentation::UnicodeSegmentation;
 
@@ -39,6 +39,24 @@ pub async fn get_now_paste() -> VuePasteData {
     VuePasteData::form(size, title_list, detail_list)
 }
 
+#[tauri::command]
+pub async fn write_to_paste(index: usize, window: tauri::Window) {
+    // 写第index个数据到剪切板
+    // write_to_clipboard
+    println!("收到的消息是第{}位的数据", index);
+    let db = get_instance();
+    // 返回值已经拿到了
+    let paste = db.get_safe_paste_list_copy().await;
+    let input_clipboard = paste.get(index);
+    match input_clipboard {
+        Some(info) => {
+            write_to_clipboard(info.to_string(), window);
+        }
+        None => {}
+    }
+}
+
+// 安全切割字符串
 fn safe_truncate(s: &str, max_graphemes: usize) -> String {
     UnicodeSegmentation::graphemes(s, true)
         .filter(|g| !g.trim().is_empty())

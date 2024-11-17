@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 
 interface itemDetailInfo {
     index: number;
@@ -50,6 +51,17 @@ const selectedItem = ref(1);
 const currentItem = computed(() => {
     return detailItems.value.find((item) => item.index === selectedItem.value);
 });
+
+async function init_listen() {
+    await listen("test_event", (event) => {
+        console.log(event);
+        if (event.event === "test_event") {
+            // 拉新内容
+            fetchPasteData();
+            console.log("拉到新的剪切板内容拉");
+        }
+    });
+}
 
 function handleSelect(key: number) {
     selectedItem.value = key;
@@ -94,8 +106,10 @@ function handleKeydown(event: any) {
         index = (index + 1) % itemKeys.length;
     } else if (event.key === "ArrowUp") {
         index = (index - 1 + itemKeys.length) % itemKeys.length;
+    } else if (event.key === "Enter") {
+        // 输入了回车就写回到剪切板
+        writeToPaste(index);
     }
-
     selectedItem.value = itemKeys[index];
 
     nextTick(() => {
@@ -127,11 +141,15 @@ async function fetchPasteData() {
     });
 }
 
+async function writeToPaste(index: number) {
+    invoke("write_to_paste", { index: index });
+}
+
 const menuContainer = ref<HTMLElement | null>(null);
 
 onMounted(() => {
+    init_listen();
     fetchPasteData();
-    console.log("输出到这里");
     nextTick(() => {
         if (menuContainer.value) {
             menuContainer.value.focus(); // 聚焦菜单容器

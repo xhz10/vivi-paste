@@ -1,15 +1,17 @@
 mod clipboard;
 mod database;
+mod event;
+mod handler;
 mod tray;
 mod window_op;
-mod handler;
 
 use crate::clipboard::start_clipboard_monitor;
+use crate::database::{get_instance, initialize_paste_db};
+use crate::handler::{get_now_paste, write_to_paste};
 use crate::window_op::init_window_status;
+use std::sync::Arc;
 use tauri::Manager;
 use tray::init_system_tray;
-use crate::database::{get_instance, initialize_paste_db};
-use crate::handler::get_now_paste;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -46,13 +48,14 @@ pub fn run() {
             // 数据的来源怎么取呢?
             initialize_paste_db(app);
             let db = get_instance();
-            // let paste_list = Arc::new(Mutex::new(Vec::new()));
+            let safe_window = Arc::new(app.get_window("main").unwrap());
             tauri::async_runtime::spawn(async move {
-                start_clipboard_monitor(db.get_safe_paste_list()).await;
+                start_clipboard_monitor(db.get_safe_paste_list(), safe_window).await;
             });
+
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_now_paste])
+        .invoke_handler(tauri::generate_handler![get_now_paste, write_to_paste])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

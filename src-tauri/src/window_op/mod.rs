@@ -1,3 +1,4 @@
+use device_query::{DeviceQuery, DeviceState, Keycode};
 use tauri::{App, Manager};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
