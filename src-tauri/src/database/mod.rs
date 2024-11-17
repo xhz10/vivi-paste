@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use once_cell::sync::OnceCell;
+use serde_json::{json, Error, Value};
 use tauri::{App, Wry};
 use tauri_plugin_store::{Store, StoreExt};
 use tokio::sync::Mutex;
@@ -30,13 +31,41 @@ impl PasteDB {
     /// 构建DB的方法
     fn form(app: &App) -> PasteDB {
         let store = app.store("paste.json").expect("初始化失败");
+        // 从数据库中加载list信息
+        let history_list = match store.get("key1") {
+            Some(json) => {
+                let res_list = match json {
+                    Value::Array(array) => {
+                        // 遍历JSON数组中的每个元素
+                        let result: Vec<String> = array
+                            .into_iter()
+                            .filter_map(|elem| elem.as_str().map(|s| s.to_string()))
+                            .collect();
+                        result
+                    }
+                    _ => Vec::new(),
+                };
+                res_list
+            }
+            None => Vec::new(),
+        };
+        println!("加载数据库");
 
         PasteDB {
             max_cache_size: 2,
             max_list_size: 20,
-            paste_list: Arc::new(Mutex::new(Vec::new())), // 返回一个现成的可用的列表
+            paste_list: Arc::new(Mutex::new(history_list)), // 返回一个现成的可用的列表
             db_store: store,
         }
+    }
+
+    /// 更新本地文件
+    pub fn refresh_db(&self, history_list: &Vec<String>) {
+        if history_list.len() == 0 {
+            return;
+        }
+        self.db_store.set("key1", json!(history_list));
+        let _r = self.db_store.save();
     }
 
     /// 返回一个安全的paste_list的可变引用
@@ -70,7 +99,6 @@ pub fn initialize_paste_db(app: &App) -> Option<Arc<PasteDB>> {
     Some(PASTE_DB.get()?.clone())
 }
 
-
-pub fn get_instance() -> Arc<PasteDB>{
+pub fn get_instance() -> Arc<PasteDB> {
     PASTE_DB.get().unwrap().clone()
 }

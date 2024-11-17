@@ -9,7 +9,10 @@ use tauri::Window;
 use tokio::sync::Mutex;
 use tokio::time::sleep;
 
-use crate::event::{send_message, VIVIEvent};
+use crate::{
+    database::get_instance,
+    event::{send_message, VIVIEvent},
+};
 
 // 写内容到剪切板
 pub fn write_to_clipboard(info: String, window: Window) {
@@ -34,6 +37,12 @@ pub async fn start_clipboard_monitor(paste_list: Arc<Mutex<Vec<String>>>, window
     // Mutex 确保同时只有一个任务可以修改字符串
     // let last_content = Arc::new(Mutex::new(String::new()));
     // tokio::spawn 启动一个新的异步任务，不会阻塞当前线程，任务会在后台异步运行
+    let mut refresh_list = Vec::new();
+    let clone_list = Arc::clone(&paste_list);
+    let pre_list = clone_list.lock().await;
+    pre_list.iter().for_each(|i| {
+        refresh_list.push(i.to_string());
+    });
     tokio::spawn({
         // 克隆一个Arc指针使新的任务共享last_content
         // let last_content = Arc::clone(&last_content);
@@ -56,8 +65,11 @@ pub async fn start_clipboard_monitor(paste_list: Arc<Mutex<Vec<String>>>, window
                     let mut paste = paste_list.lock().await;
                     // 当前剪切板的内容如果不存在就刷新
                     if !paste.contains(&current_content) {
-                        paste.insert(0, current_content);
+                        paste.insert(0, current_content.clone());
+                        refresh_list.insert(0, current_content.clone());
                         // 需要发送一个内置的事件出去
+                        let db_instance = get_instance();
+                        db_instance.refresh_db(&refresh_list);
                         send_message(VIVIEvent::Test, safe_window.clone());
                     }
                 }
